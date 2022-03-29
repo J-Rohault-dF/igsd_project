@@ -1,7 +1,8 @@
 int zoom = 30;
 final static byte inc = 2;
 
-int ELEMENT_SIZE = 10;
+int ELEMENT_SIZE = 50;
+int ELEMENT_HEIGHT = 50;
 
 int[] numbersList;
 ArrayList<Integer> listS = new ArrayList<Integer>();
@@ -15,6 +16,9 @@ void setup(){
   for(int i=0; i<100; i++) {
     numbersList[i] = i;
   }
+  
+  scale(1, -1); //Copied from online, flipping y axis
+  translate(0, -height);
  
 }
 
@@ -26,11 +30,11 @@ void draw() {
   // rotate l'objet pour mieux voir ce que ca donne 
   lights();
   background(0);
-  float mX = (mouseX-1000.0)/500.0;
+  /*float mX = (mouseX-1000.0)/500.0;
   float mY = (mouseY-1000.0)/500.0;
   translate(mouseX,mouseY);
   rotateX(PI*(mX));
-  rotateZ(PI*(mY));
+  rotateZ(PI*(mY));*/
   
   //background(0);
   //lights();
@@ -43,7 +47,7 @@ void draw() {
   
   //Place the camera
   //camera(5, 15, 5, 0, 0, 0, 0, 1, 0);
-  camera(width/2, height/2, (height/2) / tan(PI/6), 0, 0, 0, 0, 1, 0);
+  camera(width/2, -height/2, (height/2) / tan(PI/6), 0, 0, 0, 0, 1, 0);
   
   //testingCounter++; //debugging
 }
@@ -95,7 +99,7 @@ PShape makeShape(int[] numbers) {
         //Get color
         color c = getColor(n);
         c = color(255, 255, 255); //debugging
-        //noStroke();
+        noStroke();
         fill(c);
         
         //Draw hexagon
@@ -105,10 +109,25 @@ PShape makeShape(int[] numbers) {
         //Draw hexagon
         structure.beginShape(TRIANGLES);
         
+        float ewi = (1*ELEMENT_SIZE)/2;
+        float ehh = (1*ELEMENT_HEIGHT)/2;
+        
         for(int i=0; i<6; i++) {
-          structure.vertex(-50, 0, 0);
-          structure.vertex(0, 0, 50);
-          structure.vertex(50, 0, 0);
+          structure.vertex(0, ehh, 0); //Triangle 1: top
+          structure.vertex(ewi*sin(2*PI*(i*1.0)/6), ehh, ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(ewi*sin(2*PI*((i+1)*1.0)/6), ehh, ewi*cos(2*PI*((i+1)*1.0)/6));
+          
+          structure.vertex(0, -ehh, 0); //Triangle 2: bottom
+          structure.vertex(ewi*sin(2*PI*(i*1.0)/6), -ehh, ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(ewi*sin(2*PI*((i+1)*1.0)/6), -ehh, ewi*cos(2*PI*((i+1)*1.0)/6));
+          
+          structure.vertex(ewi*sin(2*PI*(i*1.0)/6), ehh, ewi*cos(2*PI*(i*1.0)/6));//Triangle 3: wall top
+          structure.vertex(ewi*sin(2*PI*((i+1)*1.0)/6), ehh, ewi*cos(2*PI*((i+1)*1.0)/6));
+          structure.vertex(ewi*sin(2*PI*(i*1.0)/6), -ehh, ewi*cos(2*PI*(i*1.0)/6));
+          
+          structure.vertex(ewi*sin(2*PI*((i+1)*1.0)/6), ehh, ewi*cos(2*PI*((i+1)*1.0)/6));//Triangle 4: wall bottom
+          structure.vertex(ewi*sin(2*PI*(i*1.0)/6), -ehh, ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(ewi*sin(2*PI*((i+1)*1.0)/6), -ehh, ewi*cos(2*PI*((i+1)*1.0)/6));
         }
         
         structure.endShape();
