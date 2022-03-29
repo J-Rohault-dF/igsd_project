@@ -1,7 +1,7 @@
 int zoom = 30;
 final static byte inc = 2;
 
-int ELEMENT_WIDTH = 50;
+int ELEMENT_WIDTH = 75;
 int ELEMENT_HEIGHT = 50;
 
 int[] numbersList;
@@ -99,7 +99,7 @@ PShape makeShape(int[] numbers) {
   int index = 0;
   while(index <= numbers.length) {
     
-    float centerY = level*ELEMENT_WIDTH;
+    float centerY = level*ELEMENT_HEIGHT;
 
       for(int cell=0; cell<((level == 0) ? 1 : 6*level); cell++) { //Get the n° of the cell
         
@@ -109,15 +109,19 @@ PShape makeShape(int[] numbers) {
         //Number of the section, and number of the cell in section
         //Splitting the hexagon into 6 sections, one for each side
         //Number of cells in each section = level n°
-        int nbCellsInSection = level;
+        int nbCellsInSection = (level == 0) ? 1 : level*6;
         int nbCellsInsideSection = 3*(level-1)*((level-1)+1)+1; //See sheet for details
         
-        int noSection = (index-nbCellsInsideSection) / 6;
-        int noCellInSection = (index-nbCellsInsideSection) % 6;
+        int noSection = (index-nbCellsInsideSection) / ceil(float(nbCellsInSection)/6);
+        int noCellInSection = (index-nbCellsInsideSection) % ceil(float(nbCellsInSection)/6);
         
         //Extrapolate the coords
-        float centerX = sin(2*PI*(1*noSection)) * (level*ELEMENT_WIDTH) + (ELEMENT_WIDTH*noCellInSection);
-        float centerZ = cos(2*PI*(1*noSection)) * (level*ELEMENT_WIDTH) + (ELEMENT_WIDTH*noCellInSection);
+        float centerX = cos(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + cos(2*PI*((noSection+2)*1.0)/6) * (noCellInSection * ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
+        float centerZ = sin(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + sin(2*PI*((noSection+2)*1.0)/6) * (noCellInSection * ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
+        
+        println(index, level, noSection, noCellInSection, /*nbCellsInSection, nbCellsInsideSection,*/ centerX, centerZ);
+        
+        if(index == 0) {centerX = 0; centerZ = 0;}
         
         //Get the level
         //Take the direction
@@ -135,25 +139,27 @@ PShape makeShape(int[] numbers) {
         
         //Draw hexagon
         
-        float ewi = (1*ELEMENT_WIDTH)/2;
-        float ehh = (1*ELEMENT_HEIGHT)/2;
+        float ewi = (1.0*ELEMENT_WIDTH)/2;
+        float ehh = (1.0*ELEMENT_HEIGHT)/2;
+        println(centerX + ewi*sin(0));
+        println(centerX + ewi*sin(PI));
         
         for(int i=0; i<6; i++) { //Draw one (1) hexagon
-          structure.vertex(centerX + 0, ehh, centerZ + 0); //Triangle 1: top
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+          structure.vertex(centerX + 0, centerY+ehh, centerZ + 0); //Triangle 1: top
+          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
           
-          structure.vertex(centerX + 0, -ehh, centerZ + 0); //Triangle 2: bottom
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), -ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), -ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+          structure.vertex(centerX + 0, centerY-ehh, centerZ + 0); //Triangle 2: bottom
+          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
           
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));//Triangle 3: wall top
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), -ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));//Triangle 3: wall top
+          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
           
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));//Triangle 4: wall bottom
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), -ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), -ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));//Triangle 4: wall bottom
+          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
         }
         
         
