@@ -4,6 +4,8 @@ final static byte inc = 2;
 int ELEMENT_WIDTH = 75;
 int ELEMENT_HEIGHT = 50;
 
+int TOTAL_NUMBERS = 3;
+
 int[] numbersList;
 ArrayList<Integer> listS = new ArrayList<Integer>();
 void setup(){
@@ -12,8 +14,8 @@ void setup(){
   smooth();
   rectMode(CENTER);
   
-  numbersList = new int[100];
-  for(int i=0; i<100; i++) {
+  numbersList = new int[TOTAL_NUMBERS];
+  for(int i=0; i<TOTAL_NUMBERS; i++) {
     numbersList[i] = i;
   }
   
@@ -66,16 +68,16 @@ color getColor(int n) {
   int sd = sumDivisors(n) - n; //Substract n to avoid the doubling later
   
   switch(n) { //Debugging
-    case 0: return color(255, 0, 0);
-    case 1: return color(255, 127, 127);
+    case 0: println('0'); return color(255, 0, 0);
+    case 1: println('1'); return color(255, 127, 127);
     case 2:
     case 3:
     case 4:
     case 5:
-    case 6: return color(255, 191, 191);
-    case 7: return color(255, 255, 0);
-    case 8: return color(255, 255, 127);
-    default: return color(255, 255, 255);
+    case 6: println('+'); return color(255, 191, 191);
+    case 7: println('7'); return color(255, 255, 0);
+    case 8: println('8'); return color(255, 255, 127);
+    default: println('D'); return color(255, 255, 255);
   }
   
   /*if(sd == 1) { //Prime
@@ -92,8 +94,8 @@ color getColor(int n) {
 
 
 PShape makeShape(int[] numbers) {
-  PShape structure = createShape();
-  structure.beginShape(TRIANGLES);
+  PShape structure;
+  structure = createShape(GROUP);
   
   int level = 0;
   int index = 0;
@@ -116,8 +118,8 @@ PShape makeShape(int[] numbers) {
         int noCellInSection = (index-nbCellsInsideSection) % ceil(float(nbCellsInSection)/6);
         
         //Extrapolate the coords
-        float centerX = cos(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + cos(2*PI*((noSection+2)*1.0)/6) * (noCellInSection * ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
-        float centerZ = sin(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + sin(2*PI*((noSection+2)*1.0)/6) * (noCellInSection * ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
+        float centerX = cos(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + cos(2*PI*((noSection+2)*1.0)/6) * (noCellInSection*ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
+        float centerZ = sin(2*PI*(noSection*1.0)/6) * (level*ELEMENT_WIDTH) + sin(2*PI*((noSection+2)*1.0)/6) * (noCellInSection*ELEMENT_WIDTH);// + (ELEMENT_WIDTH*noCellInSection);
         
         println(index, level, noSection, noCellInSection, /*nbCellsInSection, nbCellsInsideSection,*/ centerX, centerZ);
         
@@ -131,37 +133,20 @@ PShape makeShape(int[] numbers) {
         //Add the index in level (in the righty direction)
         
         //Get color
-        color c = getColor(n);
+        color c = getColor(index);
         c = getColor(index); //Debugging
         //c = color(255, 255, 255); //debugging
         //noStroke();
-        fill(c);
+        println("Index, color: ", index, c);
+        fill(getColor(index));
         
         //Draw hexagon
         
-        float ewi = (1.0*ELEMENT_WIDTH)/2;
-        float ehh = (1.0*ELEMENT_HEIGHT)/2;
-        println(centerX + ewi*sin(0));
-        println(centerX + ewi*sin(PI));
         
-        for(int i=0; i<6; i++) { //Draw one (1) hexagon
-          structure.vertex(centerX + 0, centerY+ehh, centerZ + 0); //Triangle 1: top
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
-          
-          structure.vertex(centerX + 0, centerY-ehh, centerZ + 0); //Triangle 2: bottom
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
-          
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));//Triangle 3: wall top
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));//Triangle 4: wall bottom
-          structure.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
-          structure.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
-        }
+        //println(centerZ + ewi*cos(2*PI*(3*1.0)/6));
+        //println(centerZ + ewi*sin(2*PI*(0*1.0)/6));
         
+        structure.addChild(hexagonalPrism(centerX, centerY, centerZ, ELEMENT_WIDTH, ELEMENT_HEIGHT));
         
         index++;
       }
@@ -170,6 +155,41 @@ PShape makeShape(int[] numbers) {
     
     level++;
   }
-  structure.endShape();
+  
   return structure;
+}
+
+
+
+PShape hexagonalPrism(float centerX, float centerY, float centerZ, float hexWidth, float hexHeight) {
+  PShape hex = createShape();
+  hex.beginShape(TRIANGLES);
+  
+  float ewi = (1.0*hexWidth)/2;
+  float ehh = (1.0*hexHeight)/2;
+  
+  for(int i=0; i<6; i++) { //Draw one (1) hexagon
+    //Triangle 1: top
+    hex.vertex(centerX + 0, centerY+ehh, centerZ + 0);
+    hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+    
+    //Triangle 2: bottom
+    hex.vertex(centerX + 0, centerY-ehh, centerZ + 0);
+    hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+    
+    //Triangle 3: wall top
+    hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+    
+    //Triangle 4: wall bottom
+    hex.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
+    hex.vertex(centerX + ewi*sin(2*PI*((i+1)*1.0)/6), centerY-ehh, centerZ + ewi*cos(2*PI*((i+1)*1.0)/6));
+  }
+  
+  hex.endShape();
+  return hex;
 }
