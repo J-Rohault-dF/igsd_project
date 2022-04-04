@@ -25,7 +25,6 @@ void setup(){
 }
 
 
-//int testingCounter = 0; //debugging
 
 void draw() {
   
@@ -38,16 +37,11 @@ void draw() {
   rotateX(PI*(mX));
   rotateZ(PI*(mY));*/
   
-  //background(0);
-  //lights();
-  
   shape(makeShape(numbersList));
   
   //Place the camera
   //camera(5, 15, 5, 0, 0, 0, 0, 1, 0);
   camera(width/2, -height/2, (height/2) / tan(PI/6), 0, 0, 0, 0, 1, 0);
-  
-  //testingCounter++; //debugging
 }
 
 
@@ -61,7 +55,7 @@ int sumDivisors(int n) {
 }
 
 color getColor(int n) {
-  int sd = sumDivisors(n);// - n; //Substract n to avoid the doubling later
+  int sd = sumDivisors(n);
   
   if(sd == 1) { //Prime
     return color(255, 0, 255);
@@ -91,6 +85,13 @@ PShape makeShape(int[] numbers) {
         if(index >= numbers.length) {break;}
         int n = numbers[index];
         
+        //Get the level
+        //Take the direction
+        //Use trigo to calculate the direction
+        //Multiply by the level to get the distance
+        //Get the centers
+        //Add the index in level (in the righty direction)
+        
         //Number of the section, and number of the cell in section
         //Splitting the hexagon into 6 sections, one for each side
         //Number of cells in each section = level n°
@@ -108,20 +109,8 @@ PShape makeShape(int[] numbers) {
         
         if(index == 0) {centerX = 0; centerZ = 0;}
         
-        //Get the level
-        //Take the direction
-        //Use trigo to calculate the direction
-        //Multiply by the level to get the distance
-        //Get the centers
-        //Add the index in level (in the righty direction)
-        
         //Get color
-        color c = getColor(n);
-        //c = getColor(index); //Debugging
-        //c = color(255, 255, 255); //debugging
-        //noStroke();
-        //println("Index, color: ", index, c);
-        fill(c);
+        fill(getColor(n));
         
         //Draw hexagon
         structure.addChild(hexagonalPrism(centerX, centerY, centerZ, ELEMENT_WIDTH, ELEMENT_HEIGHT));
