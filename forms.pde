@@ -41,11 +41,7 @@ void draw() {
   //background(0);
   //lights();
   
- 
   shape(makeShape(numbersList));
-  
-  //fill(color(255, 255, 255));
-  //box(100); //debugging
   
   //Place the camera
   //camera(5, 15, 5, 0, 0, 0, 0, 1, 0);
@@ -58,37 +54,24 @@ void draw() {
 
 int sumDivisors(int n) {
   int s = 0;
-  for(int i=0; i<pow(n, 1/2); i++) {
-    if((float(n)/float(i))%1 == 0) {s += i;}
+  for(int i=1; i<n; i++) {
+    if(n%i == 0) {s += i;}
   }
   return s;
 }
 
 color getColor(int n) {
-  int sd = sumDivisors(n) - n; //Substract n to avoid the doubling later
+  int sd = sumDivisors(n);// - n; //Substract n to avoid the doubling later
   
-  switch(n) { //Debugging
-    case 0: return color(255, 0, 0);
-    case 1: return color(255, 127, 127);
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6: return color(255, 191, 191);
-    case 7: return color(255, 255, 0);
-    case 8: return color(255, 255, 127);
-    default: return color(255, 255, 255);
-  }
-  
-  /*if(sd == 1) { //Prime
-    return color(0, 255, 0);
-  } else if(sd == n) { //Perfect
+  if(sd == 1) { //Prime
     return color(255, 0, 255);
-  } else if(sd < n) { //Deficient
-    return color(255, 0, 0);
-  } else { //Abundant
+  } else if(sd == n) { //Perfect
     return color(0, 0, 255);
-  }*/
+  } else if(sd < n) { //Deficient
+    return color(127, 0, 0);
+  } else { //Abundant
+    return color(0, 127, 0);
+  }
 }
 
 
@@ -133,23 +116,15 @@ PShape makeShape(int[] numbers) {
         //Add the index in level (in the righty direction)
         
         //Get color
-        color c = getColor(index);
-        c = getColor(index); //Debugging
+        color c = getColor(n);
+        //c = getColor(index); //Debugging
         //c = color(255, 255, 255); //debugging
         //noStroke();
         //println("Index, color: ", index, c);
-        fill(getColor(index));
+        fill(c);
         
         //Draw hexagon
-        
-        
-        //println(centerZ + ewi*cos(2*PI*(3*1.0)/6));
-        //println(centerZ + ewi*sin(2*PI*(0*1.0)/6));
-        
-        println("Hexagon n°"+index+": "+centerX+" "+centerZ);
-        print("Hexagon n°"+index+": ");
         structure.addChild(hexagonalPrism(centerX, centerY, centerZ, ELEMENT_WIDTH, ELEMENT_HEIGHT));
-        print("\n");
         
         index++;
       }
@@ -170,10 +145,8 @@ PShape hexagonalPrism(float centerX, float centerY, float centerZ, float hexWidt
   
   float ewi = (1.0*hexWidth)/2;
   float ehh = (1.0*hexHeight)/2;
-  print("(ewi: "+str(ewi)+") ");
   
   for(int i=0; i<6; i++) { //Draw one (1) hexagon
-    print(str(centerX + ewi*sin(2*PI*(i*1.0)/6))+" "+str(centerZ + ewi*cos(2*PI*(i*1.0)/6))+" - ");
     //Triangle 1: top
     hex.vertex(centerX + 0, centerY+ehh, centerZ + 0);
     hex.vertex(centerX + ewi*sin(2*PI*(i*1.0)/6), centerY+ehh, centerZ + ewi*cos(2*PI*(i*1.0)/6));
