@@ -26,6 +26,7 @@ void setup(){
 
 
 
+int frameCounter = 0;
 void draw() {
   
   // rotate l'objet pour mieux voir ce que ca donne 
@@ -37,11 +38,23 @@ void draw() {
   rotateX(PI*(mX));
   rotateZ(PI*(mY));*/
   
-  shape(makeShape(numbersList));
+  pushMatrix();
+  translate(-500, 0, 0);
+  rotateY(float(frameCounter)/100);
+  shape(makeShape(numbersList)); //Makes the shape n°1
+  popMatrix();
+  
+  pushMatrix();
+  translate(500, 0, 0);
+  rotateY(float(frameCounter)/100);
+  shape(makeShape(numbersList)); //Makes the shape n°2
+  popMatrix();
   
   //Place the camera
   //camera(5, 15, 5, 0, 0, 0, 0, 1, 0);
-  camera(width/2, -height/2, (height/2) / tan(PI/6), 0, 0, 0, 0, 1, 0);
+  camera(0, -height, (height*0.75) / tan(PI/6), 0, 0, 0, 0, 1, 0);
+  
+  frameCounter++;
 }
 
 
@@ -76,9 +89,11 @@ PShape makeShape(int[] numbers) {
   
   int level = 0;
   int index = 0;
+  int shapeHeight = floor(sqrt(numbers.length-(1/4)/3) - 1/2); //Inverse of 3n²+3n+1 which is the number of hexagons in a pyramid of height n
+  
   while(index <= numbers.length) {
     
-    float centerY = level*ELEMENT_HEIGHT;
+    float centerY = level*ELEMENT_HEIGHT - (1.0*ELEMENT_HEIGHT*shapeHeight)/2; //First part adds height for the level, second part moves it back down to center the height
 
       for(int cell=0; cell<((level == 0) ? 1 : 6*level); cell++) { //Get the n° of the cell
         
