@@ -4,9 +4,14 @@ final static byte inc = 2;
 int ELEMENT_WIDTH = 75;
 int ELEMENT_HEIGHT = 50;
 
+int[] polynomeL = {0, 1, 0};
+int[] polynomeR = {0, 1, 0};
+
 int TOTAL_NUMBERS = 100;
 
-int[] numbersList;
+int[] numbersListL;
+int[] numbersListR;
+
 ArrayList<Integer> listS = new ArrayList<Integer>();
 void setup(){
 
@@ -14,40 +19,42 @@ void setup(){
   smooth();
   rectMode(CENTER);
   
-  numbersList = new int[TOTAL_NUMBERS];
-  for(int i=0; i<TOTAL_NUMBERS; i++) {
-    numbersList[i] = i;
-  }
+  numbersListL = new int[TOTAL_NUMBERS];
+  calculateNumbers(numbersListL, polynomeL);
+  
+  numbersListR = new int[TOTAL_NUMBERS];
+  calculateNumbers(numbersListR, polynomeR);
   
   scale(1, -1); //Copied from online, flipping y axis
   translate(0, -height);
- 
 }
 
 
 
 int frameCounter = 0;
 void draw() {
-  
-  // rotate l'objet pour mieux voir ce que ca donne 
+   
   lights();
   background(0);
-  /*float mX = (mouseX-1000.0)/500.0;
-  float mY = (mouseY-1000.0)/500.0;
-  translate(mouseX,mouseY);
-  rotateX(PI*(mX));
-  rotateZ(PI*(mY));*/
   
   pushMatrix();
-  translate(-500, 0, 0);
+  translate(-500, -300, 0);
+  drawPolynomeInterface(polynomeL);
+  translate(0, 300, 0);
   rotateY(float(frameCounter)/100);
-  shape(makeShape(numbersList)); //Makes the shape n°1
+  shape(makeShape(numbersListL)); //Makes the shape n°1
   popMatrix();
   
   pushMatrix();
-  translate(500, 0, 0);
+  translate(500, -300, 0);
+  drawPolynomeInterface(polynomeR);
+  translate(0, 300, 0);
   rotateY(float(frameCounter)/100);
-  shape(makeShape(numbersList)); //Makes the shape n°2
+  shape(makeShape(numbersListR)); //Makes the shape n°2
+  popMatrix();
+  
+  pushMatrix();
+  translate(-100, 0, 0);
   popMatrix();
   
   //Place the camera
@@ -68,6 +75,9 @@ int sumDivisors(int n) {
 }
 
 color getColor(int n) {
+  if(n == 0) {return color(255);}
+  if(n < 0) {return color(191);}
+  
   int sd = sumDivisors(n);
   
   if(sd == 1) { //Prime
@@ -119,10 +129,8 @@ PShape makeShape(int[] numbers) {
         //Extrapolate the coords
         float centerX = cos(2*PI*(noSection*1.0)/6) * (level*(ELEMENT_WIDTH-10)) + cos(2*PI*((noSection+2)*1.0)/6) * (noCellInSection*(ELEMENT_WIDTH-10)); //Pourquoi (ELEMENT_WIDTH-10) et pas seulement ELEMENT_WIDTH ? Pas la moindre idée
         float centerZ = sin(2*PI*(noSection*1.0)/6) * (level*(ELEMENT_WIDTH-10)) + sin(2*PI*((noSection+2)*1.0)/6) * (noCellInSection*(ELEMENT_WIDTH-10));
-        
-        //println(index, level, noSection, noCellInSection, /*nbCellsInSection, nbCellsInsideSection,*/ centerX, centerZ);
-        
         if(index == 0) {centerX = 0; centerZ = 0;}
+        //println(index, level, noSection, noCellInSection, /*nbCellsInSection, nbCellsInsideSection,*/ centerX, centerZ);
         
         //Get color
         fill(getColor(n));
@@ -174,4 +182,42 @@ PShape hexagonalPrism(float centerX, float centerY, float centerZ, float hexWidt
   
   hex.endShape();
   return hex;
+}
+
+void drawPolynomeInterface(int[] poly) {
+  fill(color(255));
+  
+  /*rect(0, 0, 10, 10);
+  rect(30, 0, 10, 10);
+  rect(60, 0, 10, 10);*/
+  
+  textSize(50);
+  textAlign(CENTER);
+  text(str(poly[0])+"n² + "+str(poly[1])+"n + "+str(poly[2]), 0, 0);
+  
+  /*rect(0, 60, 10, 10);
+  rect(30, 60, 10, 10);
+  rect(60, 60, 10, 10);*/
+}
+
+void keyPressed() {
+  if(key == 'a') {polynomeL[0]++; calculateNumbers(numbersListL, polynomeL);}
+  if(key == 'z') {polynomeL[1]++; calculateNumbers(numbersListL, polynomeL);}
+  if(key == 'e') {polynomeL[2]++; calculateNumbers(numbersListL, polynomeL);}
+  if(key == 'q') {polynomeL[0]--; calculateNumbers(numbersListL, polynomeL);}
+  if(key == 's') {polynomeL[1]--; calculateNumbers(numbersListL, polynomeL);}
+  if(key == 'd') {polynomeL[2]--; calculateNumbers(numbersListL, polynomeL);}
+  
+  if(key == 'i') {polynomeR[0]++; calculateNumbers(numbersListR, polynomeR);}
+  if(key == 'o') {polynomeR[1]++; calculateNumbers(numbersListR, polynomeR);}
+  if(key == 'p') {polynomeR[2]++; calculateNumbers(numbersListR, polynomeR);}
+  if(key == 'k') {polynomeR[0]--; calculateNumbers(numbersListR, polynomeR);}
+  if(key == 'l') {polynomeR[1]--; calculateNumbers(numbersListR, polynomeR);}
+  if(key == 'm') {polynomeR[2]--; calculateNumbers(numbersListR, polynomeR);}
+}
+
+void calculateNumbers(int[] nl, int[] poly) {
+  for(int i=1; i<nl.length; i++) {
+    nl[i] = int(pow(i,2) * poly[0]) + (i*poly[1]) + poly[2];
+  }
 }
